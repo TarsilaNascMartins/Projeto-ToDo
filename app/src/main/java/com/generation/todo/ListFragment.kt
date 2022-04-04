@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
@@ -15,9 +16,12 @@ import com.generation.todo.adapter.TarefaAdapter
 import com.generation.todo.databinding.FragmentFormBinding
 import com.generation.todo.databinding.FragmentListBinding
 import com.generation.todo.model.Tarefa
+import com.generation.todo.mvvm.MainViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ListFragment : Fragment() {
+
+    private val mainViewModel : MainViewModel by activityViewModels()
 
     private lateinit var binding: FragmentListBinding
 
@@ -25,6 +29,8 @@ class ListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        mainViewModel.listTarefa()
         // Inflate the layout for this fragment
 
         binding = FragmentListBinding.inflate(
@@ -80,6 +86,13 @@ class ListFragment : Fragment() {
         //Navegação para o Fragment de Form
         binding.floatingAdd.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_formFragment)
+        }
+
+        mainViewModel.myTarefaResponse.observe(viewLifecycleOwner){
+
+            response -> if (response != null){
+               adapter.setLista(response.body()!!)}
+
         }
 
         return binding.root

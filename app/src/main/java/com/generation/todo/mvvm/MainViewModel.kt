@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import com.generation.todo.model.Categoria
+import com.generation.todo.model.Tarefa
 import com.generation.todo.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -26,6 +27,17 @@ class MainViewModel @Inject constructor(val repository :Repository):ViewModel() 
     val dataSelecionada = MutableLiveData<LocalDate>()
 
 
+
+
+    private var _myTarefaResponse =
+        MutableLiveData<Response<List<Tarefa>>>()
+
+    val myTarefaResponse: LiveData<Response<List<Tarefa>>> =
+        _myTarefaResponse
+
+
+
+
     init {
 
         dataSelecionada.value = LocalDate.now()
@@ -42,6 +54,27 @@ class MainViewModel @Inject constructor(val repository :Repository):ViewModel() 
         }
     }
 
+    fun addTarefa(tarefa: Tarefa){
+        viewModelScope.launch {
+            try {
+                    repository.addTarefa(tarefa)
+                listTarefa()
+            }catch (e:Exception){
+                    Log.d("Error", e.message.toString())
+            }
+        }
+    }
 
 
+    fun listTarefa (){
+        viewModelScope.launch {
+        try {
+            val response = repository.listTarefa()
+            _myTarefaResponse.value = response
+        }catch (e: Exception){
+            Log.e("Developer", "Error", e)  }
+    }
+    }
 }
+
+
